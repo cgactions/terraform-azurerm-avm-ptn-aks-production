@@ -260,3 +260,24 @@ variable "tags" {
   default     = null
   description = "(Optional) Tags of the resource."
 }
+
+variable "only_critical_addons_enabled" {
+  type        = bool
+  default     = false
+  description = <<EOT
+Set to true to apply the 'CriticalAddonsOnly=true:NoSchedule' taint on
+the default (system) node pool. Note that toggling this on an existing
+cluster triggers replacement or rotation of the system node pool.
+EOT
+}
+
+variable "temporary_default_pool_rotation_name" {
+  type        = string
+  default     = null
+  description = <<EOT
+If you’re changing a property that causes the default node pool to be replaced
+(including only_critical_addons_enabled), you can specify a temporary name here
+to allow Terraform/AKS to perform a rolling replacement.
+If null, AKS will forcibly re-create the node pool in-place (disrupting pods).
+EOT
+}
