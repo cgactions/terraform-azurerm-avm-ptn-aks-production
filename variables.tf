@@ -281,3 +281,11 @@ to allow Terraform/AKS to perform a rolling replacement.
 If null, AKS will forcibly re-create the node pool in-place (disrupting pods).
 EOT
 }
+
+variable "aks_sku_selector" {
+  type = string
+  default     = "Standard"
+  description = <<EOT
+Optionally specifies the SKU (i.e. tier) for the AKS cluster.
+EOT
+}

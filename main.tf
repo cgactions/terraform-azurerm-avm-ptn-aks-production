@@ -67,7 +67,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   private_cluster_enabled           = true
   private_dns_zone_id               = var.private_dns_zone_id
   role_based_access_control_enabled = true
-  sku_tier                          = "Standard"
+  sku_tier                          = var.aks_sku_selector
   tags                              = var.tags
   workload_identity_enabled         = true
 
