@@ -85,8 +85,8 @@ resource "azurerm_kubernetes_cluster" "this" {
     tags                    = merge(var.tags, var.agents_tags)
     vnet_subnet_id          = var.network.node_subnet_id
     zones                   = local.default_node_pool_available_zones
-    only_critical_addons_enabled = var.only_critical_addons_enabled
-    temporary_name_for_rotation  = var.temporary_default_pool_rotation_name
+    # only_critical_addons_enabled = var.only_critical_addons_enabled
+    # temporary_name_for_rotation  = var.temporary_default_pool_rotation_name
 
     upgrade_settings {
       max_surge = "10%"
