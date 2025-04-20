@@ -264,21 +264,13 @@ resource "azurerm_management_lock" "this" {
 }
 
 
-# In main.tf
-
 resource "azurerm_kubernetes_cluster_node_pool" "this" {
-  # Conditional for_each:
-  # If cluster ID is known, attempt to create the map from original local.node_pools list.
-  # If cluster ID is unknown, use an empty map {} for the for_each.
-  for_each = azurerm_kubernetes_cluster.this.id != null ? tomap({
-    # This uses your original local.node_pools (flattened list)
-    # It relies on pool.name being calculable *after* cluster ID is known
+  for_each = tomap({
     for pool in local.node_pools : pool.name => pool
-  }) : {}
+  })
 
-  # Attributes below reference the structure of objects in your original local.node_pools list
   kubernetes_cluster_id = azurerm_kubernetes_cluster.this.id
-  name                  = each.value.name # Uses 'name' from original local.node_pools object
+  name                  = each.value.name
   vm_size               = each.value.vm_size
   auto_scaling_enabled  = true
   max_count             = each.value.max_count
@@ -289,17 +281,15 @@ resource "azurerm_kubernetes_cluster_node_pool" "this" {
   os_sku                = each.value.os_sku
   tags                  = each.value.tags
   vnet_subnet_id        = var.network.node_subnet_id
-  zones                 = each.value.zone # Uses 'zone' (list) from original local.node_pools object
+  zones                 = each.value.zone
 
   depends_on = [azapi_update_resource.aks_cluster_post_create]
 
   lifecycle {
     precondition {
-      # Checks 'name' from original local.node_pools object
       condition     = can(regex("^[a-z][a-z0-9]{0,11}$", each.value.name))
       error_message = "The name must begin with a lowercase letter, contain only lowercase letters and numbers, and be between 1 and 12 characters in length."
     }
-    # ignore_changes = [ tags ] # Add if needed
   }
 }
 
