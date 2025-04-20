@@ -38,25 +38,25 @@ locals {
 
 
 locals {
-  node_pools_map = merge([
-    for pool_key, pool_data in local.zonetagged_node_pools : {
-      for zone in pool_data.zones :
-        "${pool_key}-${zone}" => {
-          original_key         = pool_key
-          generated_name       = substr("${pool_data.name}${zone}", 0, 12)
-          vm_size              = pool_data.vm_size
-          orchestrator_version = pool_data.orchestrator_version
-          max_count            = pool_data.max_count
-          min_count            = pool_data.min_count
-          tags                 = pool_data.tags
-          labels               = pool_data.labels
-          os_sku               = pool_data.os_sku
-          mode                 = pool_data.mode
-          os_disk_size_gb      = pool_data.os_disk_size_gb
-          zone_list            = [zone]
-        }
-    }
-  ]...)
+  # Flatten a list of var.node_pools and zones
+  node_pools = flatten([
+    for pool in local.zonetagged_node_pools : [
+      for zone in pool.zones : {
+        # concatenate name and zone trim to 12 characters
+        name                 = "${substr(pool.name, 0, 10)}${zone}"
+        vm_size              = pool.vm_size
+        orchestrator_version = pool.orchestrator_version
+        max_count            = pool.max_count
+        min_count            = pool.min_count
+        tags                 = pool.tags
+        labels               = pool.labels
+        os_sku               = pool.os_sku
+        mode                 = pool.mode
+        os_disk_size_gb      = pool.os_disk_size_gb
+        zone                 = [zone]
+      }
+    ]
+  ])
 }
 locals {
   log_analytics_tables = ["AKSAudit", "AKSAuditAdmin", "AKSControlPlane", "ContainerLogV2"]
