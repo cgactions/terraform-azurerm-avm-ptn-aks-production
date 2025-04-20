@@ -265,12 +265,10 @@ resource "azurerm_management_lock" "this" {
 
 
 resource "azurerm_kubernetes_cluster_node_pool" "this" {
-  for_each = tomap({
-    for pool in local.node_pools : pool.name => pool
-  })
+  for_each = local.node_pools_map
 
   kubernetes_cluster_id = azurerm_kubernetes_cluster.this.id
-  name                  = each.value.name
+  name                  = each.value.generated_name
   vm_size               = each.value.vm_size
   auto_scaling_enabled  = true
   max_count             = each.value.max_count
@@ -281,15 +279,17 @@ resource "azurerm_kubernetes_cluster_node_pool" "this" {
   os_sku                = each.value.os_sku
   tags                  = each.value.tags
   vnet_subnet_id        = var.network.node_subnet_id
-  zones                 = each.value.zone
+  zones                 = each.value.zone_list
 
   depends_on = [azapi_update_resource.aks_cluster_post_create]
 
   lifecycle {
     precondition {
-      condition     = can(regex("^[a-z][a-z0-9]{0,11}$", each.value.name))
-      error_message = "The name must begin with a lowercase letter, contain only lowercase letters and numbers, and be between 1 and 12 characters in length."
+      condition     = can(regex("^[a-z][a-z0-9]{0,11}$", each.value.generated_name))
+      error_message = "The generated node pool name ('${each.value.generated_name}') must begin with a lowercase letter, contain only lowercase letters and numbers, and be between 1 and 12 characters in length."
     }
+    # If you need ignore_changes for tags, add it here like this:
+    # ignore_changes = [ tags ]
   }
 }
 
