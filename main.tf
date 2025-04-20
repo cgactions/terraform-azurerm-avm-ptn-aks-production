@@ -279,7 +279,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "this" {
   os_sku                = each.value.os_sku
   tags                  = each.value.tags
   vnet_subnet_id        = var.network.node_subnet_id
-  zones                 = each.value.zone
+  zones                 = each.value.zones
 
   depends_on = [azapi_update_resource.aks_cluster_post_create]
 
