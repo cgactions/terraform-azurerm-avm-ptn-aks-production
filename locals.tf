@@ -38,11 +38,9 @@ locals {
 
 
 locals {
-  # Flatten a list of var.node_pools and zones
-  node_pools = flatten([
+  node_pools = var.node_pools != null && can(length(keys(var.node_pools))) ? flatten([
     for pool in local.zonetagged_node_pools : [
       for zone in pool.zones : {
-        # concatenate name and zone trim to 12 characters
         name                 = "${substr(pool.name, 0, 10)}${zone}"
         vm_size              = pool.vm_size
         orchestrator_version = pool.orchestrator_version
@@ -56,8 +54,9 @@ locals {
         zone                 = [zone]
       }
     ]
-  ])
+  ]) : []
 }
+
 locals {
   log_analytics_tables = ["AKSAudit", "AKSAuditAdmin", "AKSControlPlane", "ContainerLogV2"]
 }
