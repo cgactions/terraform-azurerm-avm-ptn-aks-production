@@ -152,7 +152,6 @@ variable "node_pools" {
     os_disk_size_gb = optional(number, null)
     tags            = optional(map(string), {})
     labels          = optional(map(string), {})
-    zones                = optional(list(string), [])
   }))
   default     = {}
   description = <<-EOT
